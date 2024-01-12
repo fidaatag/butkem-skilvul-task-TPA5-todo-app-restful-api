@@ -1,4 +1,4 @@
-# Bootcamp Skilvul FullStack TPA5 - Todo App
+# Bootcamp Skilvul FullStack TPA5 - Todo App - Restful API
 
 Hasil dari tugas ini adalah API sederhana yang bisa melakukan CRUD, authentication, authorization. Ketentuan tugas berdasarkan pada dokumentasi [ini](https://github.com/impactbyte/full-stack-web-assignments/tree/master/TPA005-backend)
 
