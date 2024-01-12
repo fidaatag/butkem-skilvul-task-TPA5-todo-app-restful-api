@@ -3,9 +3,8 @@ require('dotenv').config();
 const secretKey = process.env.MY_JWT;
 
 const userAuth = (req, res, next) => {
-    const token = req.header('token') || req.cookies.token
-
     try {
+        const token = req.header('token') || req.cookies.token
         if (!token) {
             return res.status(401).json({ message: "Tidak dapat mengakses, belum login" });
         };
@@ -17,7 +16,8 @@ const userAuth = (req, res, next) => {
         };
 
     } catch(err) {
-        return res.json({ message: "Gagal melakukan otentikasi", err });
+        res.json({ message: "Gagal melakukan otentikasi", err });
+        return
     };
 
     next();
