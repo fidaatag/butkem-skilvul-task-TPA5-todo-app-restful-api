@@ -1,8 +1,10 @@
 const todo = require('../models/todo')
 
-// handleError
-const hadleErrorResponde = (res, errMessage) => {
-    res.status
+// helper respond
+const respond = (res, success, message, data = null) => {
+    const status = success ? 200 : 401;
+    const responseData = data ? { success, message, data } : { success, message };
+    res.status(status).json(responseData);
 }
 
 // create todo
@@ -23,17 +25,10 @@ const createTodoController = async (req, res) => {
             user: user.user_id
         });
 
-        res.status(200).json({
-            success: true,
-            message: "Berhasil membuat todo",
-            todo: newTodo
-        });
+        respond(res, true, "Berhasil membuat todo", newTodo);
         
     } catch (err) {
-        res.status(401).json({
-            success: false,
-            message: err.message,
-        });
+        respond(res, false, err.message);
     };
 };
 
@@ -41,17 +36,10 @@ const createTodoController = async (req, res) => {
 const getAllTodoController = async (req, res) => {
     try {
         const todos = await todo.find({ user: req.user.user_id });
-        res.status(200).json({
-            success: true,
-            message: "Berhasil melihat semua todo",
-            todos
-        });
+        respond(res, true, "Berhasil melihat semua todo", todos);
 
     } catch (err) {
-        res.status(401).json({
-            success: false,
-            message: err.message,
-        });
+        respond(res, false, err.message);
     };
 };
 
@@ -60,17 +48,16 @@ const getDetailTodoController = async (req, res) => {
     try {
         const { todoId } = req.params;
         const todoDetail = await todo.findById(todoId);
-        res.status(200).json({
-            success: true,
-            message: "Berhasil mendapatkan detail todo",
-            todoDetail
-        });
+        
+        if (!todoDetail) {
+            respond(res, false, "Todo tidak ditemukan", null);
+            return;
+        }
+
+        respond(res, true, "Berhasil mendapatkan detail todo", todoDetail);
 
     } catch (err) {
-        res.status(401).json({
-            success: false,
-            message: err.message,
-        });
+        respond(res, false, err.message);
     };
 }
 
@@ -94,36 +81,45 @@ const updateTodoController = async (req, res) => {
         // Memperbarui todo hanya dengan field yang valid
         const todoUpdate = await todo.findByIdAndUpdate(todoId, updateFields, { new: true });
 
-        res.status(200).json({
-            success: true,
-            message: "Berhasil memperbarui todo",
-            todo: todoUpdate
-        });
+        if (!todoUpdate) {
+            respond(res, false, "Todo tidak ditemukan");
+            return;
+        }
+
+        respond(res, true, "Berhasil memperbarui todo", todoUpdate);
 
     } catch (err) {
-        res.status(401).json({
-            success: false,
-            message: err.message,
-        });
+        respond(res, false, err.message);
     };
 };
 
 // delete todo
 const deleteTodoController = async (req, res) => {
     try {
-        const { todoId } = req.params
-        const todoDelete = await todo.findByIdAndDelete(todoId)
-        res.status(200).json({
-            success: true,
-            message: "Berhasil menghapus todo",
-            todoDelete
-        })
+        const { todoId } = req.params;
+        const deletedTodo = await todo.findByIdAndDelete(todoId);
+
+        if (!deletedTodo) {
+            respond(res, false, "Todo tidak ditemukan");
+            return;
+        }
+
+        respond(res, true, "Berhasil menghapus todo");
+
     } catch (err) {
-        res.status(401).json({
-            success: false,
-            message: err.message,
-        });
+        respond(res, false, err.message);
     };
+};
+
+// delete semua todo
+const deleteAllTodoController = async (req,res) => {
+    try {
+        await todo.deleteMany({});
+        respond(res, true, "Berhasil menghapus semua todo");
+
+    } catch (err) {
+        respond(res, false, err.message);
+    }
 };
 
 
@@ -132,5 +128,6 @@ module.exports = {
     getDetailTodoController,
     createTodoController,
     updateTodoController,
-    deleteTodoController
+    deleteTodoController,
+    deleteAllTodoController
 };

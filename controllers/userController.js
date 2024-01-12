@@ -29,7 +29,7 @@ const userLoginController = async (req, res) => {
         }).json({
             succes: true,
             token,
-            userInDB
+            user: userInDB
         });
         
     } catch (err) {
@@ -71,7 +71,7 @@ const userRegisterController = async (req, res) => {
         }).json({
             succes: true,
             token,
-            createdUser
+            user: createdUser
         })
 
     } catch(err) {
